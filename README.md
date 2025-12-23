@@ -26,7 +26,7 @@ Sebelum menjalankan proyek ini, pastikan Anda memiliki:
 ### 1. Clone Repository
 
 ```bash
-git clone <url-repository>
+git clone https://github.com/ksazhr/food-delivery.git
 cd food-delivery-node
 
 ```
