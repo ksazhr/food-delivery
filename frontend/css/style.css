@@ -1,0 +1,568 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f6f8;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.menu-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.menu-card h3 {
+  margin-top: 0;
+}
+
+.menu-card p {
+  margin: 6px 0;
+}
+
+.menu-card input {
+  width: 70px;
+  padding: 5px;
+}
+
+.menu-card button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.menu-card button:hover {
+  background: #43a047;
+}
+
+.logout-btn {
+  margin-top: 30px;
+  display: block;
+  width: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  border: none;
+  background: #e53935;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #c62828;
+}
+
+/* PAYMENT */
+.payment-box {
+  max-width: 400px;
+  margin: 80px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.payment-box button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pay-btn {
+  background: #2196F3;
+  color: white;
+}
+
+.cancel-btn {
+  background: #9e9e9e;
+  color: white;
+}
+
+/* ======================
+   AUTH (LOGIN & REGISTER)
+====================== */
+.auth-container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.auth-container h1 {
+  margin-bottom: 40px;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 25px;
+  margin: 20px auto;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.auth-card h2 {
+  margin-bottom: 15px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card input {
+  margin-bottom: 12px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.auth-card button {
+  padding: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.auth-card button:hover {
+  background: #43a047;
+}
+
+.result-text {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #555;
+}
+
+/* ======================
+   DASHBOARD
+====================== */
+.dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #4CAF50, #81C784);
+  color: white;
+  text-align: center;
+}
+
+.dashboard p {
+  margin: 15px 0 30px;
+  font-size: 18px;
+}
+
+.dashboard-btn a {
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: white;
+  color: #4CAF50;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  opacity: 0.85;
+}
+
+.auth-card {
+  display: none;
+}
+
+/* ======================
+   HEADER HALAMAN ORDER
+====================== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+
+  margin-bottom: 30px;
+  padding: 20px;
+
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  border-radius: 12px;
+  color: white;
+}
+
+.page-header h1 {
+  font-size: 42px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.header-icon {
+  font-size: 40px;
+}
+
+/* ======================
+   HEADER MENU
+====================== */
+.menu-header {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+}
+
+/* NAVIGASI MENU */
+.menu-nav {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.menu-nav .btn-secondary {
+  font-size: 18px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+}
+
+/* BIAR GRID TURUN KE BAWAH */
+.menu-grid {
+  margin-top: 10px;
+}
+
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f6f8;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.menu-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.menu-card h3 {
+  margin-top: 0;
+}
+
+.menu-card p {
+  margin: 6px 0;
+}
+
+.menu-card input {
+  width: 70px;
+  padding: 5px;
+}
+
+.menu-card button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.menu-card button:hover {
+  background: #43a047;
+}
+
+.logout-btn {
+  margin-top: 30px;
+  display: block;
+  width: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  border: none;
+  background: #e53935;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #c62828;
+}
+
+/* PAYMENT */
+.payment-box {
+  max-width: 400px;
+  margin: 80px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.payment-box button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pay-btn {
+  background: #2196F3;
+  color: white;
+}
+
+.cancel-btn {
+  background: #9e9e9e;
+  color: white;
+}
+
+/* ======================
+   AUTH (LOGIN & REGISTER)
+====================== */
+.auth-container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.auth-container h1 {
+  margin-bottom: 40px;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 25px;
+  margin: 20px auto;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.auth-card h2 {
+  margin-bottom: 15px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card input {
+  margin-bottom: 12px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.auth-card button {
+  padding: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.auth-card button:hover {
+  background: #43a047;
+}
+
+.result-text {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #555;
+}
+
+/* ======================
+   DASHBOARD
+====================== */
+.dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #4CAF50, #81C784);
+  color: white;
+  text-align: center;
+}
+
+.dashboard p {
+  margin: 15px 0 30px;
+  font-size: 18px;
+}
+
+.dashboard-btn a {
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: white;
+  color: #4CAF50;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  opacity: 0.85;
+}
+
+.auth-card {
+  display: none;
+}
+
+/* ======================
+   HEADER HALAMAN ORDER
+====================== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+
+  margin-bottom: 30px;
+  padding: 20px;
+
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  border-radius: 12px;
+  color: white;
+}
+
+.page-header h1 {
+  font-size: 42px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.header-icon {
+  font-size: 40px;
+}
+
+/* ======================
+   HEADER MENU
+====================== */
+.menu-header {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+}
+
+/* NAVIGASI MENU */
+.menu-nav {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.menu-nav .btn-secondary {
+  font-size: 18px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+}
+
+/* BIAR GRID TURUN KE BAWAH */
+.menu-grid {
+  margin-top: 10px;
+}
+
+/* FORCE FIX TOMBOL ORDER SAYA */
+.menu-nav a.btn-secondary {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border: 1px solid #a5d6a7 !important;
+}
+
+.menu-nav a.btn-secondary:hover {
+  background-color: #c8e6c9 !important;
+}
+
+/* TOMBOL BAYAR DI ORDER SAYA */
+.pay-btn-small {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  background: #2196F3;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pay-btn-small:hover {
+  background: #1976D2;
+}
+
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pembayaran</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="payment-box">
+
+  <h1>💳 Pembayaran</h1>
+
+  <!-- INFO ORDER -->
+  <div class="payment-info">
+    <p><strong>ID Order:</strong> <span id="orderIdText">-</span></p>
+    <p><strong>Total Bayar:</strong> <span id="orderTotalText">-</span></p>
+  </div>
+
+  <button class="pay-btn" onclick="payOrder()">
+    Bayar Sekarang
+  </button>
+
+  <button class="cancel-btn" onclick="cancelPayment()">
+    Batal
+  </button>
+
+</div>
+
+<script src="js/payment.js"></script>
+</body>
+</html>
