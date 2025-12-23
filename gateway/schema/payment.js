@@ -1,0 +1,48 @@
+const axios = require('axios');
+const { GraphQLInt, GraphQLNonNull } = require('graphql');
+const { PaymentType } = require('./types');
+
+module.exports = {
+  payOrder: {
+    type: PaymentType,
+    args: {
+      id_order: { type: GraphQLNonNull(GraphQLInt) },
+      amount: { type: GraphQLNonNull(GraphQLInt) }
+    },
+    async resolve(_, args, context) {
+
+      // (opsional) cek auth user
+      if (!context.user) {
+        throw new Error('Unauthorized');
+      }
+
+      const res = await axios.post(
+        'http://localhost:3004/graphql',
+        {
+          query: `
+            mutation PayOrder($id: Int!, $amount: Int!) {
+              payOrder(
+                id_order: $id
+                amount: $amount
+              ) {
+                id_payment
+                status
+              }
+            }
+          `,
+          variables: {
+            id: args.id_order,
+            amount: args.amount
+          }
+        },
+        {
+          headers: {
+            'x-internal-key': 'GATEWAY_SECRET_123'
+          }
+        }
+      );
+
+      return res.data.data.payOrder;
+    }
+  }
+};
