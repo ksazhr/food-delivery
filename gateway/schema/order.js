@@ -19,7 +19,6 @@ module.exports = {
             query {
               orders {
                 id_order
-                id_produk
                 total_harga
                 status
               }
