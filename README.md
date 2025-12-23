@@ -34,7 +34,7 @@ cd food-delivery-node
 ### 2. Install Dependencies
 
 Setiap service memiliki dependencies sendiri. Jalankan perintah berikut di setiap folder service:
-# Di setiap folder (gateway, menu-service, order-service, payment-service, user-service) jalankan:
+Di setiap folder (gateway, menu-service, order-service, payment-service, user-service) jalankan:
 
 ```bash
 npm install
@@ -103,10 +103,30 @@ query {
 
 ```graphql
 mutation {
-  createOrder(id_produk: 1, jumlah: 2) {
+  addOrderItem(
+    id_order: 1
+    id_produk: 6
+    jumlah: 3
+  ) {
+    id_item
+    subtotal
+  }
+}
+
+```
+**Menampilkan Seluruh Pesanan**
+
+```graphql
+query {
+  order(id_order: 1) {
     id_order
     total_harga
     status
+    items {
+      id_produk
+      jumlah
+      subtotal
+    }
   }
 }
 
