@@ -10,7 +10,9 @@ const RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
     menus: menu.menus,
-    menu: menu.menu
+    menu: menu.menu,
+    orders: order.orders,
+    order: order.order
   }
 });
 
@@ -24,6 +26,7 @@ const Mutation = new GraphQLObjectType({
     deleteMenu: menu.deleteMenu,
 
     // ORDER
+    addOrderItem: order.addOrderItem,
     createOrder: order.createOrder,
     updateOrderStatus: order.updateOrderStatus,
 
