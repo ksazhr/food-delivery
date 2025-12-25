@@ -1,35 +1,66 @@
 # 🍔 Food Ordering System
-GraphQL Microservices dengan Docker, MySQL, dan Gateway
+
+GraphQL Microservices menggunakan **Docker**, **MySQL**, dan **Gateway**.
 
 ---
 
-1️⃣ INSTALL DOCKER
+## 🧰 Teknologi
+- Node.js
+- Express
+- GraphQL
+- MySQL
+- Docker & Docker Compose
+- Postman
 
-Download Docker Desktop:
+---
+
+## 1️⃣ Install Docker
+
+Download Docker Desktop:  
 https://www.docker.com/products/docker-desktop/
 
-Pastikan Docker jalan:
+Pastikan Docker sudah berjalan dengan membuka terminal / CMD:
+
 ```bash
 docker --version
 docker compose version
+```
 
-2️⃣ JALANKAN PROJECT
+---
+
+## 2️⃣ Jalankan Project
 
 Masuk ke folder project, lalu jalankan:
 
+```bash
 docker compose up --build
+```
 
-3️⃣ ENDPOINT GRAPHQL
+Tunggu sampai semua service berjalan:
+- mysql
+- user-service
+- menu-service
+- order-service
+- payment-service
+- gateway
 
-Semua request dilakukan lewat Gateway:
+---
+
+## 3️⃣ Endpoint GraphQL (Gateway)
+
+Semua request dilakukan melalui Gateway:
 
 http://localhost:4000/graphql
 
+Gunakan **Postman** → Tab **GraphQL**.
 
-Gunakan Postman → Tab GraphQL
+---
 
-4️⃣ LOGIN (WAJIB)
-Login Admin / User
+## 4️⃣ Login (Wajib)
+
+### Login Admin / User
+
+```graphql
 mutation {
   login(
     email: "admin@mail.com"
@@ -39,17 +70,25 @@ mutation {
     role
   }
 }
+```
 
+Simpan `token` dari response.
 
-📌 Simpan token.
+---
 
-5️⃣ SET AUTHORIZATION (POSTMAN)
+## 5️⃣ Set Authorization (Postman)
 
-Tab Headers:
+Masuk ke tab **Headers**, tambahkan:
 
+```
 Authorization: Bearer <TOKEN_DARI_LOGIN>
+```
 
-6️⃣ ADMIN – LIHAT SEMUA USER
+---
+
+## 6️⃣ Admin – Lihat Semua User
+
+```graphql
 query {
   users {
     id
@@ -58,11 +97,15 @@ query {
     role
   }
 }
+```
 
+Catatan: hanya bisa diakses oleh **ADMIN**.
 
-⚠️ Hanya bisa diakses oleh ADMIN.
+---
 
-7️⃣ ADMIN – TAMBAH MENU
+## 7️⃣ Admin – Tambah Menu
+
+```graphql
 mutation {
   createMenu(
     nama_produk: "Ayam Geprek"
@@ -72,27 +115,32 @@ mutation {
   ) {
     id_produk
     nama_produk
-    kategori
     harga
     stok
   }
 }
+```
 
-8️⃣ USER – LIHAT SEMUA MENU
+---
+
+## 8️⃣ User – Lihat Semua Menu
+
+```graphql
 query {
   menus {
     id_produk
     nama_produk
-    kategori
     harga
     stok
   }
 }
+```
 
-9️⃣ USER – BUAT ORDER
+---
 
-📌 SESUIAI SCHEMA PROJECT (id_produk + jumlah)
+## 9️⃣ User – Buat Order
 
+```graphql
 mutation {
   createOrder(
     id_produk: 1
@@ -103,8 +151,13 @@ mutation {
     status
   }
 }
+```
 
-🔟 USER – LIHAT SEMUA ORDER
+---
+
+## 🔟 User – Lihat Semua Order
+
+```graphql
 query {
   orders {
     id_order
@@ -112,8 +165,13 @@ query {
     status
   }
 }
+```
 
-1️⃣1️⃣ USER / ADMIN – LIHAT ORDER BERDASARKAN ID
+---
+
+## 1️⃣1️⃣ User / Admin – Lihat Order Berdasarkan ID
+
+```graphql
 query {
   order(id_order: 1) {
     id_order
@@ -121,19 +179,19 @@ query {
     status
   }
 }
+```
 
+Catatan:
+- Jika `order(id)` bernilai `null`
+- Tetapi `orders` berhasil
+- Kemungkinan menu pada order sudah dihapus
+- Karena query detail order menggunakan JOIN
 
-⚠️ Catatan:
+---
 
-Jika order(id) bernilai null
+## 1️⃣2️⃣ User – Bayar Order
 
-Tetapi orders berhasil
-
-Kemungkinan menu yang terkait sudah dihapus
-
-Karena query detail order menggunakan JOIN
-
-1️⃣2️⃣ USER – BAYAR ORDER
+```graphql
 mutation {
   payOrder(
     id_order: 1
@@ -143,58 +201,32 @@ mutation {
     status
   }
 }
+```
 
+Setelah pembayaran, status order akan otomatis berubah.
 
-📌 Setelah payment:
+---
 
-status order otomatis berubah (misalnya DIPROSES)
+## 1️⃣3️⃣ Admin – Hapus Menu
 
-1️⃣3️⃣ ADMIN – HAPUS MENU
+```graphql
 mutation {
   deleteMenu(id_produk: 1) {
     id_produk
     nama_produk
   }
 }
+```
 
-
-⚠️ Menghapus menu yang sudah pernah dipesan dapat menyebabkan
-detail order (order(id)) tidak bisa ditampilkan.
-
-🧠 CATATAN PENTING
-
-orders → selalu bisa ditampilkan
-
-order(id) → tergantung relasi menu
-
-Hard delete menu dapat mempengaruhi order history
-
-Untuk produksi disarankan soft delete
-
-✅ SELESAI
-
-Jika:
-
-Docker berjalan
-
-Gateway bisa diakses
-
-Query GraphQL berhasil
-
-Maka project berjalan dengan benar.
-
+Catatan:
+Menghapus menu yang sudah pernah dipesan dapat menyebabkan
+detail order tidak bisa ditampilkan.
 
 ---
 
-## 🔥 KENAPA YANG INI AMAN DICOPAS?
-✔ `createOrder(id_produk, jumlah)` **sesuai schema kamu**  
-✔ Tidak ada `items[]` palsu  
-✔ Semua query **pernah kamu pakai & berhasil**  
-✔ Tidak ngarang tabel / field  
+## ✅ Selesai
 
-Kalau kamu mau:
-- versi **lebih singkat 1 halaman**
-- versi **bahasa laporan kampus**
-- atau **diagram arsitektur**
-
-tinggal bilang — sekarang pondasinya **SUDAH BENAR** 💪
+Project berhasil dijalankan jika:
+- Docker berjalan
+- Gateway dapat diakses
+- Query GraphQL berhasil dijalankan di Postman
