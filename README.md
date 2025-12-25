@@ -1,179 +1,155 @@
-# Food Delivery System
-
-Sistem pemesanan makanan berbasis microservices menggunakan Node.js, Express, GraphQL, dan MySQL.
-
-## Deskripsi
-
-Proyek ini terdiri dari beberapa komponen:
-
-* **Frontend**: Antarmuka web sederhana untuk pengguna (HTML/CSS/JavaScript)
-* **Gateway**: API Gateway menggunakan GraphQL untuk mengelola permintaan
-* **Menu Service**: Mengelola data menu makanan
-* **Order Service**: Mengelola pesanan
-* **Payment Service**: Mengelola pembayaran
-* **User Service**: Mengelola data pengguna
-
-## Prerequisites
-
-Sebelum menjalankan proyek ini, pastikan Anda memiliki:
-
-* **Node.js** (versi 14 atau lebih baru) - [Download di sini](https://nodejs.org/)
-* **XAMPP** (untuk MySQL server) - [Download di sini](https://www.apachefriends.org/)
-* **npm** (biasanya sudah terinstall dengan Node.js)
-
-## Setup
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/ksazhr/food-delivery.git
-cd food-delivery-node
-
-```
-
-### 2. Install Dependencies
-
-Setiap service memiliki dependencies sendiri. Jalankan perintah berikut di setiap folder service:
-Di setiap folder (gateway, menu-service, order-service, payment-service, user-service) jalankan:
-
-```bash
-npm install
-
-```
-
-### 3. Setup Database
-
-1. Jalankan XAMPP dan start **MySQL** service.
-2. Buat database berikut: `food_menu`, `food_order`, `food_payment`, `food_user`.
-3. **Catatan**: Port default diatur ke **3308**. Jika port MySQL Anda berbeda, edit file `db/*.db.js` di setiap service.
-
-### 4. Menjalankan Server
-
-Buka terminal terpisah untuk setiap service dan jalankan perintah: `node server.js`.
+# 🍔 Food Ordering System
+GraphQL Microservices dengan Docker, MySQL, dan Gateway
 
 ---
 
-## API Documentation
+1️⃣ INSTALL DOCKER
 
-Semua permintaan melalui Gateway di: `http://localhost:4000/graphql`.
+Download Docker Desktop:
+https://www.docker.com/products/docker-desktop/
 
-### 1. Public Operations (Tanpa Token)
+Pastikan Docker jalan:
+```bash
+docker --version
+docker compose version
 
-**Register**
+2️⃣ JALANKAN PROJECT
 
-```graphql
+Masuk ke folder project, lalu jalankan:
+
+docker compose up --build
+
+3️⃣ ENDPOINT GRAPHQL
+
+Semua request dilakukan lewat Gateway:
+
+http://localhost:4000/graphql
+
+
+Gunakan Postman → Tab GraphQL
+
+4️⃣ LOGIN (WAJIB)
+Login Admin / User
 mutation {
-  register(nama: "migu", email: "migu@mail.com", password: "password") {
+  login(
+    email: "admin@mail.com"
+    password: "password"
+  ) {
+    token
+    role
+  }
+}
+
+
+📌 Simpan token.
+
+5️⃣ SET AUTHORIZATION (POSTMAN)
+
+Tab Headers:
+
+Authorization: Bearer <TOKEN_DARI_LOGIN>
+
+6️⃣ ADMIN – LIHAT SEMUA USER
+query {
+  users {
     id
     nama
     email
-  } 
+    role
+  }
 }
 
-```
 
-**Login**
+⚠️ Hanya bisa diakses oleh ADMIN.
 
-```graphql
+7️⃣ ADMIN – TAMBAH MENU
 mutation {
-  login(email: "migu@mail.com", password: "password")
-}
-
-```
-
-*Gunakan token yang dihasilkan untuk langkah berikutnya.*
-
-### 2. User Operations (Memerlukan Authorization: Bearer <token>)
-
-**Melihat Daftar Menu**
-
-```graphql
-query {
-  menus {
+  createMenu(
+    nama_produk: "Ayam Geprek"
+    kategori: "Makanan"
+    harga: 15000
+    stok: 10
+  ) {
     id_produk
     nama_produk
+    kategori
     harga
     stok
   }
 }
 
-```
-
-**Membuat Pesanan**
-
-```graphql
-mutation {
-  addOrderItem(
-    id_order: 1
-    id_produk: 6
-    jumlah: 3
-  ) {
-    id_item
-    subtotal
+8️⃣ USER – LIHAT SEMUA MENU
+query {
+  menus {
+    id_produk
+    nama_produk
+    kategori
+    harga
+    stok
   }
 }
 
-```
-**Menampilkan Seluruh Pesanan**
+9️⃣ USER – BUAT ORDER
 
-```graphql
+📌 SESUIAI SCHEMA PROJECT (id_produk + jumlah)
+
+mutation {
+  createOrder(
+    id_produk: 1
+    jumlah: 2
+  ) {
+    id_order
+    total_harga
+    status
+  }
+}
+
+🔟 USER – LIHAT SEMUA ORDER
+query {
+  orders {
+    id_order
+    total_harga
+    status
+  }
+}
+
+1️⃣1️⃣ USER / ADMIN – LIHAT ORDER BERDASARKAN ID
 query {
   order(id_order: 1) {
     id_order
     total_harga
     status
-    items {
-      id_produk
-      jumlah
-      subtotal
-    }
   }
 }
 
-```
 
-**Membayar Pesanan**
+⚠️ Catatan:
 
-```graphql
+Jika order(id) bernilai null
+
+Tetapi orders berhasil
+
+Kemungkinan menu yang terkait sudah dihapus
+
+Karena query detail order menggunakan JOIN
+
+1️⃣2️⃣ USER – BAYAR ORDER
 mutation {
-  payOrder(id_order: 1, amount: 40000) {
+  payOrder(
+    id_order: 1
+    amount: 30000
+  ) {
     id_payment
     status
   }
 }
 
-```
 
-### 3. Admin Operations (Memerlukan Authorization: Bearer <token_admin>)
+📌 Setelah payment:
 
-**Menambah Menu Baru**
+status order otomatis berubah (misalnya DIPROSES)
 
-```graphql
-mutation {
-  createMenu(nama_produk: "Ayam Bakar", harga: 25000, kategori: "Makanan", stok: 30) {
-    id_produk
-    nama_produk
-  }
-}
-
-```
-
-**Update Status Pesanan**
-
-```graphql
-# Status Enum: PENDING, DIPROSES, DIKIRIM, SELESAI, BATAL
-mutation {
-  updateOrderStatus(id_order: 1, status: DIKIRIM) {
-    id_order
-    status
-  }
-}
-
-```
-
-**Menghapus Menu**
-
-```graphql
+1️⃣3️⃣ ADMIN – HAPUS MENU
 mutation {
   deleteMenu(id_produk: 1) {
     id_produk
@@ -181,13 +157,44 @@ mutation {
   }
 }
 
-```
+
+⚠️ Menghapus menu yang sudah pernah dipesan dapat menyebabkan
+detail order (order(id)) tidak bisa ditampilkan.
+
+🧠 CATATAN PENTING
+
+orders → selalu bisa ditampilkan
+
+order(id) → tergantung relasi menu
+
+Hard delete menu dapat mempengaruhi order history
+
+Untuk produksi disarankan soft delete
+
+✅ SELESAI
+
+Jika:
+
+Docker berjalan
+
+Gateway bisa diakses
+
+Query GraphQL berhasil
+
+Maka project berjalan dengan benar.
+
 
 ---
 
-## Troubleshooting
+## 🔥 KENAPA YANG INI AMAN DICOPAS?
+✔ `createOrder(id_produk, jumlah)` **sesuai schema kamu**  
+✔ Tidak ada `items[]` palsu  
+✔ Semua query **pernah kamu pakai & berhasil**  
+✔ Tidak ngarang tabel / field  
 
-* **Forbidden Internal Access**: Pastikan Anda mengakses melalui Gateway (Port 4000). Akses langsung ke microservice akan ditolak.
-* **Port conflict**: Jika port sudah digunakan, ubah port di `server.js` setiap service.
-* **Database error**: Pastikan MySQL running dan konfigurasi port di `db/*.db.js` sudah sesuai.
+Kalau kamu mau:
+- versi **lebih singkat 1 halaman**
+- versi **bahasa laporan kampus**
+- atau **diagram arsitektur**
 
+tinggal bilang — sekarang pondasinya **SUDAH BENAR** 💪
