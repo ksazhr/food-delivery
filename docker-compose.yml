@@ -1,0 +1,79 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: food_mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_NAME: food_user
+
+  menu-service:
+    build: ./menu-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_NAME: food_menu
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_NAME: food_order
+      MENU_SERVICE_URL: http://menu-service:3001/graphql
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_NAME: food_payment
+      ORDER_SERVICE_URL: http://order-service:3002/graphql
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "4000:4000"
+    depends_on:
+      - user-service
+      - menu-service
+      - order-service
+      - payment-service
+    environment:
+      USER_SERVICE_URL: http://user-service:3003/graphql
+      MENU_SERVICE_URL: http://menu-service:3001/graphql
+      ORDER_SERVICE_URL: http://order-service:3002/graphql
+      PAYMENT_SERVICE_URL: http://payment-service:3004/graphql
+
+volumes:
+  mysql_data:

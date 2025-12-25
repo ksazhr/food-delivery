@@ -19,6 +19,9 @@ const UserType = new GraphQLObjectType({
   }
 });
 
+const USER_SERVICE_URL =
+  process.env.USER_SERVICE_URL || 'http://localhost:3003/graphql';
+
 /* ======================
    MUTATIONS
 ====================== */
@@ -31,7 +34,7 @@ const register = {
   },
 async resolve(_, args) {
     const res = await axios.post(
-      'http://localhost:3003/graphql',
+      USER_SERVICE_URL,
       {
         query: `
           mutation($nama: String!, $email: String!, $password: String!) {
@@ -70,7 +73,7 @@ const login = {
   async resolve(_, args) {
     try {
       const res = await axios.post(
-        'http://localhost:3003/graphql',
+        USER_SERVICE_URL,
         {
           query: `
             mutation($email: String!, $password: String!) {

@@ -2,6 +2,9 @@ const axios = require('axios');
 const { GraphQLInt, GraphQLNonNull } = require('graphql');
 const { PaymentType } = require('./types');
 
+const PAYMENT_SERVICE_URL =
+  process.env.PAYMENT_SERVICE_URL || 'http://localhost:3004/graphql';
+
 module.exports = {
   payOrder: {
     type: PaymentType,
@@ -17,7 +20,7 @@ module.exports = {
       }
 
       const res = await axios.post(
-        'http://localhost:3004/graphql',
+        PAYMENT_SERVICE_URL,
         {
           query: `
             mutation PayOrder($id: Int!, $amount: Int!) {

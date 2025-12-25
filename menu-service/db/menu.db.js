@@ -1,23 +1,23 @@
 const mysql = require('mysql2/promise');
 
-const menuDB = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'food_menu',
-  port: 3308
-});
+let pool;
 
-module.exports = menuDB;
-module.exports.runMenuMigrations = runMenuMigrations;
+async function connectMenuDB(retry = 10) {
+  if (pool) return pool; // 🔥 reuse pool
 
-// Migration and Seeder for Menu
-async function runMenuMigrations() {
   try {
-    console.log('Running menu migrations...');
+    pool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD || '',
+      database: 'food_menu',
+      port: 3306
+    });
 
-    // 1. Create table menu
-    const createTableQuery = `
+    await pool.query('SELECT 1');
+    console.log('✅ menu DB connected');
+
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS menu (
         id_produk INT AUTO_INCREMENT PRIMARY KEY,
         nama_produk VARCHAR(100) NOT NULL,
@@ -26,36 +26,38 @@ async function runMenuMigrations() {
         stok INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `;
+    `);
 
-    await menuDB.query(createTableQuery);
-
-    // 2. Seed data
     const menus = [
-      { nama_produk: 'Nasi Goreng', harga: 20000, kategori: 'Makanan', stok: 20 },
-      { nama_produk: 'Ayam Geprek Sambal Bawang', harga: 18000, kategori: 'Makanan', stok: 15 },
-      { nama_produk: 'Mie Ayam Bakso', harga: 18000, kategori: 'Makanan', stok: 25 },
-      { nama_produk: 'Sate Ayam Madura', harga: 27000, kategori: 'Makanan', stok: 10 },
-      { nama_produk: 'Soto Betawi', harga: 24000, kategori: 'Makanan', stok: 12 },
-      { nama_produk: 'Nasi Uduk Komplit', harga: 15000, kategori: 'Makanan', stok: 14 },
-      { nama_produk: 'Es Teh Manis', harga: 5000, kategori: 'Minuman', stok: 30 },
-      { nama_produk: 'Kopi Susu Gula Aren', harga: 10000, kategori: 'Minuman', stok: 18 },
-      { nama_produk: 'Jus Jeruk', harga: 10000, kategori: 'Minuman', stok: 22 },
-      { nama_produk: 'Air Mineral 600ml', harga: 5000, kategori: 'Minuman', stok: 40 }
+      ['Nasi Goreng', 20000, 'Makanan', 20],
+      ['Ayam Geprek Sambal Bawang', 18000, 'Makanan', 15],
+      ['Mie Ayam Bakso', 18000, 'Makanan', 25],
+      ['Sate Ayam Madura', 27000, 'Makanan', 10],
+      ['Soto Betawi', 24000, 'Makanan', 12],
+      ['Nasi Uduk Komplit', 15000, 'Makanan', 14],
+      ['Es Teh Manis', 5000, 'Minuman', 30],
+      ['Kopi Susu Gula Aren', 10000, 'Minuman', 18],
+      ['Jus Jeruk', 10000, 'Minuman', 22],
+      ['Air Mineral 600ml', 5000, 'Minuman', 40]
     ];
 
-    for (const menu of menus) {
-      const insertQuery = `
-        INSERT IGNORE INTO menu (nama_produk, harga, kategori, stok)
-        VALUES (?, ?, ?, ?)
-      `;
-      await menuDB.query(insertQuery, [menu.nama_produk, menu.harga, menu.kategori, menu.stok]);
+    for (const m of menus) {
+      await pool.query(
+        `INSERT IGNORE INTO menu (nama_produk, harga, kategori, stok)
+         VALUES (?, ?, ?, ?)`,
+        m
+      );
     }
 
-  } catch (error) {
-    console.error('Migration failed:', error);
-    process.exit(1);
+    console.log('✅ menu table & seed ready');
+    return pool;
+
+  } catch (err) {
+    console.log(`⏳ menu DB belum siap, retry ${retry}`);
+    if (retry === 0) throw err;
+    await new Promise(r => setTimeout(r, 3000));
+    return connectMenuDB(retry - 1);
   }
 }
 
-runMenuMigrations();
+module.exports = connectMenuDB;

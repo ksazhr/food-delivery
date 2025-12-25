@@ -1,37 +1,48 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',          
-  database: 'food_payment',
-  port: 3308
-});
+let pool; // 🔥 singleton
 
-// 1. Buat satu variabel promise
-const paymentDB = pool.promise();
-
-async function runPaymentMigrations() {
+async function connectDB(retry = 10) {
   try {
-    console.log('Running payment migrations...');
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS payments (
-        id_payment INT AUTO_INCREMENT PRIMARY KEY,
-        id_order INT NOT NULL,
-        amount INT NOT NULL,
-        status ENUM('SUCCESS', 'FAILED') NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
-    // 2. Gunakan langsung tanpa .promise() lagi
-    await paymentDB.query(createTableQuery);
-    console.log('Payment table is ready.');
-  } catch (error) {
-    console.error('Payment migration failed:', error);
+    if (pool) return pool; // ⛔ jangan bikin pool baru
+
+    pool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD || '',
+      database: 'food_payment',
+      port: 3306
+    });
+
+    await pool.query('SELECT 1');
+    console.log('✅ payment DB connected');
+
+    return pool;
+  } catch (err) {
+    console.log(`⏳ payment DB belum siap, retry ${retry}`);
+    if (retry === 0) throw err;
+    await new Promise(r => setTimeout(r, 3000));
+    pool = null;
+    return connectDB(retry - 1);
   }
 }
 
-runPaymentMigrations();
+async function runPaymentMigrations(db) {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id_payment INT AUTO_INCREMENT PRIMARY KEY,
+      id_order INT NOT NULL,
+      amount INT NOT NULL,
+      status ENUM('SUCCESS', 'FAILED') NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
 
-// 3. Export variabel promise tadi
-module.exports = paymentDB;
+async function initPaymentDB() {
+  const db = await connectDB();
+  await runPaymentMigrations(db);
+  return db;
+}
+
+module.exports = initPaymentDB;

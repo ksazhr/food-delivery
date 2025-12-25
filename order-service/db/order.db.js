@@ -1,22 +1,19 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',  
-  database: 'food_order',
-  port: 3308
-});
-
-const orderDB = pool.promise();
-module.exports = orderDB;
-
-async function runOrderMigrations() {
+async function connectOrderDB(retry = 10) {
   try {
-    console.log('Running order migrations...');
+    const pool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD || '',
+      database: 'food_order',
+      port: 3306
+    });
 
-    // 1️⃣ Parent table DULU
-    const createOrdersTable = `
+    await pool.query('SELECT 1');
+    console.log('✅ order DB connected');
+
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
         id_order INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NULL,
@@ -24,10 +21,9 @@ async function runOrderMigrations() {
         status ENUM('PENDING','DIPROSES','DIKIRIM','SELESAI','BATAL') DEFAULT 'PENDING',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `;
+    `);
 
-    // 2️⃣ Child table SETELAHNYA
-    const createOrderItemsTable = `
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS order_items (
         id_item INT AUTO_INCREMENT PRIMARY KEY,
         id_order INT NOT NULL,
@@ -38,16 +34,17 @@ async function runOrderMigrations() {
         FOREIGN KEY (id_order) REFERENCES orders(id_order)
           ON DELETE CASCADE
       );
-    `;
+    `);
 
-    await orderDB.query(createOrdersTable);
-    await orderDB.query(createOrderItemsTable);
+    console.log('✅ orders & order_items tables ready');
+    return pool;
 
-    console.log('Order & Order Items tables are ready.');
-  } catch (error) {
-    console.error('Order migration failed:', error);
+  } catch (err) {
+    console.log(`⏳ order DB belum siap, retry ${retry}`);
+    if (retry === 0) throw err;
+    await new Promise(r => setTimeout(r, 3000));
+    return connectOrderDB(retry - 1);
   }
 }
 
-// Jalankan migrasi
-runOrderMigrations();
+module.exports = connectOrderDB;
