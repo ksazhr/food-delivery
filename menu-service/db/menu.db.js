@@ -1,12 +1,8 @@
 const mysql = require('mysql2/promise');
 
-let pool;
-
 async function connectMenuDB(retry = 10) {
-  if (pool) return pool; // 🔥 reuse pool
-
   try {
-    pool = mysql.createPool({
+    const pool = mysql.createPool({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD || '',
@@ -14,9 +10,11 @@ async function connectMenuDB(retry = 10) {
       port: 3306
     });
 
+    // cek koneksi
     await pool.query('SELECT 1');
     console.log('✅ menu DB connected');
 
+    // create table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS menu (
         id_produk INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,28 +26,40 @@ async function connectMenuDB(retry = 10) {
       );
     `);
 
-    const menus = [
-      ['Nasi Goreng', 20000, 'Makanan', 20],
-      ['Ayam Geprek Sambal Bawang', 18000, 'Makanan', 15],
-      ['Mie Ayam Bakso', 18000, 'Makanan', 25],
-      ['Sate Ayam Madura', 27000, 'Makanan', 10],
-      ['Soto Betawi', 24000, 'Makanan', 12],
-      ['Nasi Uduk Komplit', 15000, 'Makanan', 14],
-      ['Es Teh Manis', 5000, 'Minuman', 30],
-      ['Kopi Susu Gula Aren', 10000, 'Minuman', 18],
-      ['Jus Jeruk', 10000, 'Minuman', 22],
-      ['Air Mineral 600ml', 5000, 'Minuman', 40]
-    ];
+    // 🔥 CEK APAKAH SUDAH ADA DATA
+    const [countRows] = await pool.query(
+      'SELECT COUNT(*) AS total FROM menu'
+    );
 
-    for (const m of menus) {
-      await pool.query(
-        `INSERT IGNORE INTO menu (nama_produk, harga, kategori, stok)
-         VALUES (?, ?, ?, ?)`,
-        m
-      );
+    if (countRows[0].total === 0) {
+      console.log('🌱 menu table empty, seeding data...');
+
+      const menus = [
+        ['Nasi Goreng', 20000, 'Makanan', 20],
+        ['Ayam Geprek Sambal Bawang', 18000, 'Makanan', 15],
+        ['Mie Ayam Bakso', 18000, 'Makanan', 25],
+        ['Sate Ayam Madura', 27000, 'Makanan', 10],
+        ['Soto Betawi', 24000, 'Makanan', 12],
+        ['Nasi Uduk Komplit', 15000, 'Makanan', 14],
+        ['Es Teh Manis', 5000, 'Minuman', 30],
+        ['Kopi Susu Gula Aren', 10000, 'Minuman', 18],
+        ['Jus Jeruk', 10000, 'Minuman', 22],
+        ['Air Mineral 600ml', 5000, 'Minuman', 40]
+      ];
+
+      for (const m of menus) {
+        await pool.query(
+          `INSERT INTO menu (nama_produk, harga, kategori, stok)
+           VALUES (?, ?, ?, ?)`,
+          m
+        );
+      }
+
+      console.log('✅ menu seeded');
+    } else {
+      console.log('ℹ️ menu already seeded, skip');
     }
 
-    console.log('✅ menu table & seed ready');
     return pool;
 
   } catch (err) {
