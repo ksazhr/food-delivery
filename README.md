@@ -204,6 +204,22 @@ mutation {
 }
 ```
 
+## 1️⃣3️⃣ Admin – Update Status Pemesanan
+
+```graphql
+mutation {
+  updateOrderStatus(
+    id_order: 1
+    status: SELESAI
+  ) {
+    id_order
+    status
+  }
+}
+
+```
+
+
 Catatan:
 Menghapus menu yang sudah pernah dipesan dapat menyebabkan
 detail order tidak bisa ditampilkan.
