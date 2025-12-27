@@ -248,10 +248,3 @@ mutation {
 - Setelah pembayaran berhasil, status order akan otomatis berubah
 
 ---
-
-## ✅ Checklist Berhasil
-
-- Docker berjalan tanpa error
-- Semua container aktif
-- Gateway dapat diakses
-- Semua query & mutation GraphQL berhasil dijalankan
