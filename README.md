@@ -64,7 +64,7 @@ Gunakan **Postman** → Tab **GraphQL**.
 mutation {
   login(
     email: "admin@mail.com"
-    password: "password"
+    password: "12345678"
   ) {
     token
     role
@@ -86,7 +86,7 @@ Authorization: Bearer <TOKEN_DARI_LOGIN>
 
 ---
 
-## 6️⃣ Admin – Lihat Semua User
+## 6️⃣ Admin – Lihat Semua User (Tidak melalui Gateway - Gunakan http://localhost:3003/graphql)
 
 ```graphql
 query {
@@ -160,20 +160,6 @@ mutation {
 ```graphql
 query {
   orders {
-    id_order
-    total_harga
-    status
-  }
-}
-```
-
----
-
-## 1️⃣1️⃣ User / Admin – Lihat Order Berdasarkan ID
-
-```graphql
-query {
-  order(id_order: 1) {
     id_order
     total_harga
     status
