@@ -10,11 +10,9 @@ async function connectMenuDB(retry = 10) {
       port: 3306
     });
 
-    // cek koneksi
     await pool.query('SELECT 1');
     console.log('✅ menu DB connected');
 
-    // create table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS menu (
         id_produk INT AUTO_INCREMENT PRIMARY KEY,
@@ -26,14 +24,12 @@ async function connectMenuDB(retry = 10) {
       );
     `);
 
-    // 🔥 CEK APAKAH SUDAH ADA DATA
-    const [countRows] = await pool.query(
+    const [[{ total }]] = await pool.query(
       'SELECT COUNT(*) AS total FROM menu'
     );
 
-    if (countRows[0].total === 0) {
-      console.log('🌱 menu table empty, seeding data...');
-
+    if (total === 0) {
+      console.log('🌱 seeding menu data...');
       const menus = [
         ['Nasi Goreng', 20000, 'Makanan', 20],
         ['Ayam Geprek Sambal Bawang', 18000, 'Makanan', 15],
@@ -54,16 +50,13 @@ async function connectMenuDB(retry = 10) {
           m
         );
       }
-
       console.log('✅ menu seeded');
-    } else {
-      console.log('ℹ️ menu already seeded, skip');
     }
 
     return pool;
 
   } catch (err) {
-    console.log(`⏳ menu DB belum siap, retry ${retry}`);
+    console.log(`⏳ menu DB retry ${retry}`);
     if (retry === 0) throw err;
     await new Promise(r => setTimeout(r, 3000));
     return connectMenuDB(retry - 1);
