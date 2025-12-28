@@ -24,32 +24,39 @@ async function connectMenuDB(retry = 10) {
       );
     `);
 
-    const menus = [
-      ['Nasi Goreng', 20000, 'Makanan', 20],
-      ['Ayam Geprek Sambal Bawang', 18000, 'Makanan', 15],
-      ['Mie Ayam Bakso', 18000, 'Makanan', 25],
-      ['Sate Ayam Madura', 27000, 'Makanan', 10],
-      ['Soto Betawi', 24000, 'Makanan', 12],
-      ['Nasi Uduk Komplit', 15000, 'Makanan', 14],
-      ['Es Teh Manis', 5000, 'Minuman', 30],
-      ['Kopi Susu Gula Aren', 10000, 'Minuman', 18],
-      ['Jus Jeruk', 10000, 'Minuman', 22],
-      ['Air Mineral 600ml', 5000, 'Minuman', 40]
-    ];
+    const [[{ total }]] = await pool.query(
+      'SELECT COUNT(*) AS total FROM menu'
+    );
 
-    for (const m of menus) {
-      await pool.query(
-        `INSERT IGNORE INTO menu (nama_produk, harga, kategori, stok)
-         VALUES (?, ?, ?, ?)`,
-        m
-      );
+    if (total === 0) {
+      console.log('🌱 seeding menu data...');
+      const menus = [
+        ['Nasi Goreng', 20000, 'Makanan', 20],
+        ['Ayam Geprek Sambal Bawang', 18000, 'Makanan', 15],
+        ['Mie Ayam Bakso', 18000, 'Makanan', 25],
+        ['Sate Ayam Madura', 27000, 'Makanan', 10],
+        ['Soto Betawi', 24000, 'Makanan', 12],
+        ['Nasi Uduk Komplit', 15000, 'Makanan', 14],
+        ['Es Teh Manis', 5000, 'Minuman', 30],
+        ['Kopi Susu Gula Aren', 10000, 'Minuman', 18],
+        ['Jus Jeruk', 10000, 'Minuman', 22],
+        ['Air Mineral 600ml', 5000, 'Minuman', 40]
+      ];
+
+      for (const m of menus) {
+        await pool.query(
+          `INSERT INTO menu (nama_produk, harga, kategori, stok)
+           VALUES (?, ?, ?, ?)`,
+          m
+        );
+      }
+      console.log('✅ menu seeded');
     }
 
-    console.log('✅ menu table & seed ready');
     return pool;
 
   } catch (err) {
-    console.log(`⏳ menu DB belum siap, retry ${retry}`);
+    console.log(`⏳ menu DB retry ${retry}`);
     if (retry === 0) throw err;
     await new Promise(r => setTimeout(r, 3000));
     return connectMenuDB(retry - 1);
