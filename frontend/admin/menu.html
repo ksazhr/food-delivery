@@ -25,18 +25,31 @@
   <main class="content">
     <h1>Kelola Menu</h1>
 
-    <!-- TABEL MENU -->
+    <!-- ===== FORM TAMBAH MENU ===== -->
+    <div class="add-menu">
+      <h3>Tambah Menu</h3>
+
+    <input type="text" id="nama" placeholder="Nama Menu" />
+    <input type="text" id="kategori" placeholder="Kategori (makanan/minuman)" />
+    <input type="number" id="harga" placeholder="Harga" />
+    <input type="number" id="stok" placeholder="Stok" />
+
+      <button onclick="addMenu()">Tambah</button>
+    </div>
+
+    <!-- ===== TABLE MENU ===== -->
     <table>
       <thead>
         <tr>
           <th>Nama</th>
           <th>Harga</th>
+          <th>Stok</th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody id="menuList">
         <tr>
-          <td colspan="3">Memuat menu...</td>
+          <td colspan="4">Memuat menu...</td>
         </tr>
       </tbody>
     </table>
