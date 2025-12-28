@@ -144,10 +144,31 @@ mutation {
   }
 }
 ```
+---
+
+## A2️3️⃣ Update Menu
+
+```graphql
+mutation {
+  updateMenu(
+    id_produk: 2
+    nama_produk: "Ayam Geprek Sambal Bawang"
+    harga: 18000
+    kategori: "Makanan"
+    stok: 50
+  ) {
+    id_produk
+    nama_produk
+    harga
+    kategori
+    stok
+  }
+}
+```
 
 ---
 
-## A3️⃣ Update Status Pesanan
+## A3️4️⃣ Update Status Pesanan
 
 ```graphql
 mutation {
@@ -163,7 +184,7 @@ mutation {
 
 ---
 
-## A4️⃣ Hapus Menu
+## A4️5️⃣ Hapus Menu
 
 ```graphql
 mutation {
