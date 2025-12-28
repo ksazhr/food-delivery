@@ -76,7 +76,7 @@ async function selesaikanOrder(idOrder) {
     mutation {
       updateOrderStatus(
         id_order: ${idOrder},
-        status: "SELESAI"
+        status: SELESAI
       ) {
         id_order
       }
@@ -87,12 +87,13 @@ async function selesaikanOrder(idOrder) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
+      "Authorization": "Bearer " + localStorage.getItem("token")
     },
     body: JSON.stringify({ query })
   });
 
   fetchOrders();
 }
+
 
 fetchOrders();
