@@ -1,6 +1,6 @@
 # 🍔 Food Ordering System
 
-GraphQL Microservices menggunakan **Docker**, **MySQL**, dan **Gateway**.
+GraphQL Microservices menggunakan **Docker**, **MySQL**, dan **API Gateway**.
 
 ---
 
@@ -19,7 +19,7 @@ GraphQL Microservices menggunakan **Docker**, **MySQL**, dan **Gateway**.
 Download Docker Desktop:  
 https://www.docker.com/products/docker-desktop/
 
-Pastikan Docker sudah berjalan dengan membuka terminal / CMD:
+Cek instalasi Docker:
 
 ```bash
 docker --version
@@ -36,7 +36,7 @@ Masuk ke folder project, lalu jalankan:
 docker compose up --build
 ```
 
-Tunggu sampai semua service berjalan:
+Pastikan container berikut berjalan:
 - mysql
 - user-service
 - menu-service
@@ -50,21 +50,21 @@ Tunggu sampai semua service berjalan:
 
 Semua request dilakukan melalui Gateway:
 
+```
 http://localhost:4000/graphql
+```
 
-Gunakan **Postman** → Tab **GraphQL**.
+Gunakan **Postman → Tab GraphQL**.
 
 ---
 
-## 4️⃣ Login (Wajib)
-
-### Login Admin / User
+## 4️⃣ Login/Register (WAJIB – Admin & User)
 
 ```graphql
 mutation {
   login(
     email: "admin@mail.com"
-    password: "password"
+    password: "12345678"
   ) {
     token
     role
@@ -72,13 +72,27 @@ mutation {
 }
 ```
 
-Simpan `token` dari response.
+```graphql
+mutation {
+  register(
+    nama: "Budi"
+    email: "budi@mail.com"
+    password: "12345678"
+  ) {
+    id
+    nama
+    email
+    role
+  }
+}
+
+```
 
 ---
 
-## 5️⃣ Set Authorization (Postman)
+## 5️⃣ Authorization (Postman)
 
-Masuk ke tab **Headers**, tambahkan:
+Tambahkan Header:
 
 ```
 Authorization: Bearer <TOKEN_DARI_LOGIN>
@@ -86,7 +100,17 @@ Authorization: Bearer <TOKEN_DARI_LOGIN>
 
 ---
 
-## 6️⃣ Admin – Lihat Semua User
+# 👤 ROLE: ADMIN
+
+---
+
+## A1️⃣ Lihat Semua User  
+(Tidak melalui Gateway)
+
+Endpoint:
+```
+http://localhost:3003/graphql
+```
 
 ```graphql
 query {
@@ -99,11 +123,9 @@ query {
 }
 ```
 
-Catatan: hanya bisa diakses oleh **ADMIN**.
-
 ---
 
-## 7️⃣ Admin – Tambah Menu
+## A2️⃣ Tambah Menu
 
 ```graphql
 mutation {
@@ -123,7 +145,40 @@ mutation {
 
 ---
 
-## 8️⃣ User – Lihat Semua Menu
+## A3️⃣ Update Status Pesanan
+
+```graphql
+mutation {
+  updateOrderStatus(
+    id_order: 1
+    status: SELESAI
+  ) {
+    id_order
+    status
+  }
+}
+```
+
+---
+
+## A4️⃣ Hapus Menu
+
+```graphql
+mutation {
+  deleteMenu(id_produk: 1) {
+    id_produk
+    nama_produk
+  }
+}
+```
+
+---
+
+# 👥 ROLE: USER
+
+---
+
+## U1️⃣ Lihat Semua Menu
 
 ```graphql
 query {
@@ -138,7 +193,7 @@ query {
 
 ---
 
-## 9️⃣ User – Buat Order
+## U2️⃣ Buat Order
 
 ```graphql
 mutation {
@@ -155,7 +210,7 @@ mutation {
 
 ---
 
-## 🔟 User – Lihat Semua Order
+## U3️⃣ Lihat Semua Order
 
 ```graphql
 query {
@@ -169,27 +224,7 @@ query {
 
 ---
 
-## 1️⃣1️⃣ User / Admin – Lihat Order Berdasarkan ID
-
-```graphql
-query {
-  order(id_order: 1) {
-    id_order
-    total_harga
-    status
-  }
-}
-```
-
-Catatan:
-- Jika `order(id)` bernilai `null`
-- Tetapi `orders` berhasil
-- Kemungkinan menu pada order sudah dihapus
-- Karena query detail order menggunakan JOIN
-
----
-
-## 1️⃣2️⃣ User – Bayar Order
+## U4️⃣ Bayar Order
 
 ```graphql
 mutation {
@@ -203,30 +238,13 @@ mutation {
 }
 ```
 
-Setelah pembayaran, status order akan otomatis berubah.
-
 ---
 
-## 1️⃣3️⃣ Admin – Hapus Menu
+## ℹ️ Catatan
 
-```graphql
-mutation {
-  deleteMenu(id_produk: 1) {
-    id_produk
-    nama_produk
-  }
-}
-```
-
-Catatan:
-Menghapus menu yang sudah pernah dipesan dapat menyebabkan
-detail order tidak bisa ditampilkan.
+- Jika `order(id)` bernilai `null` namun `orders` berhasil:
+  - Kemungkinan menu pada order sudah dihapus
+  - Query detail order menggunakan JOIN
+- Setelah pembayaran berhasil, status order akan otomatis berubah
 
 ---
-
-## ✅ Selesai
-
-Project berhasil dijalankan jika:
-- Docker berjalan
-- Gateway dapat diakses
-- Query GraphQL berhasil dijalankan di Postman
