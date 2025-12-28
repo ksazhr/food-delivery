@@ -2,7 +2,18 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema');
 
+const connectOrderDB = require('./db/order.db');
+
 const app = express();
+
+(async () => {
+  try {
+    await connectOrderDB();
+    console.log('🔥 Order DB migration & seed done');
+  } catch (err) {
+    console.error('❌ Order DB init failed:', err.message);
+  }
+})();
 
 app.use((req, res, next) => {
   if (req.headers['x-internal-key'] !== 'GATEWAY_SECRET_123') {

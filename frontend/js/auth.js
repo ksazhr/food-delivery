@@ -16,11 +16,23 @@ const regPassword = document.getElementById("regPassword");
 const registerResult = document.getElementById("registerResult");
 
 /* ======================
+   HELPER: DECODE JWT
+====================== */
+function parseJwt(token) {
+  try {
+    const base64Payload = token.split(".")[1];
+    const payload = atob(base64Payload);
+    return JSON.parse(payload);
+  } catch {
+    return null;
+  }
+}
+
+/* ======================
    REGISTER
-   → BERHASIL PINDAH KE LOGIN
 ====================== */
 if (registerForm) {
-  registerForm.addEventListener("submit", async e => {
+  registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     registerResult.innerText = "Mendaftarkan akun...";
 
@@ -32,41 +44,43 @@ if (registerForm) {
       }
     `;
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query,
-        variables: {
-          nama: regNama.value,
-          email: regEmail.value,
-          password: regPassword.value
-        }
-      })
-    });
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query,
+          variables: {
+            nama: regNama.value,
+            email: regEmail.value,
+            password: regPassword.value
+          }
+        })
+      });
 
-    const data = await res.json();
-    console.log("Register response:", data);
+      const data = await res.json();
 
-    if (data.errors) {
-      registerResult.innerText = data.errors[0].message;
-      return;
+      if (data.errors) {
+        registerResult.innerText = data.errors[0].message;
+        return;
+      }
+
+      registerForm.reset();
+      registerResult.innerText = "Registrasi berhasil, silakan login";
+      window.location.hash = "#login";
+
+    } catch (err) {
+      registerResult.innerText = "Terjadi kesalahan.";
+      console.error(err);
     }
-
-    // REGISTER BERHASIL
-    registerForm.reset();
-    registerResult.innerText = "";
-
-    // PINDAH KE LOGIN
-    window.location.hash = "#login";
   });
 }
 
 /* ======================
-   LOGIN
+   LOGIN (USER & ADMIN)
 ====================== */
 if (loginForm) {
-  loginForm.addEventListener("submit", async e => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     loginResult.innerText = "Login diproses...";
 
@@ -76,30 +90,47 @@ if (loginForm) {
       }
     `;
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query,
-        variables: {
-          email: loginEmail.value,
-          password: loginPassword.value
-        }
-      })
-    });
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query,
+          variables: {
+            email: loginEmail.value,
+            password: loginPassword.value
+          }
+        })
+      });
 
-    const data = await res.json();
-    console.log("Login response:", data);
+      const data = await res.json();
 
-    if (data.errors) {
-      loginResult.innerText = data.errors[0].message;
-      return;
+      if (data.errors) {
+        loginResult.innerText = data.errors[0].message;
+        return;
+      }
+
+      const token = data.data.login;
+      localStorage.setItem("token", token);
+
+      const payload = parseJwt(token);
+      if (!payload || !payload.role) {
+        loginResult.innerText = "Token tidak valid.";
+        return;
+      }
+
+      localStorage.setItem("role", payload.role);
+
+      // 🚦 REDIRECT SESUAI ROLE
+      if (payload.role === "ADMIN") {
+        window.location.href = "admin/dashboard.html";
+      } else {
+        window.location.href = "menu.html";
+      }
+
+    } catch (err) {
+      loginResult.innerText = "Terjadi kesalahan saat login.";
+      console.error(err);
     }
-
-    // LOGIN BERHASIL → SIMPAN TOKEN
-    localStorage.setItem("token", data.data.login);
-
-    // MASUK KE MENU
-    window.location.href = "menu.html";
   });
 }

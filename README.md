@@ -1,91 +1,129 @@
-# Food Delivery System
+# 🍔 Food Ordering System
 
-Sistem pemesanan makanan berbasis microservices menggunakan Node.js, Express, GraphQL, dan MySQL.
-
-## Deskripsi
-
-Proyek ini terdiri dari beberapa komponen:
-
-* **Frontend**: Antarmuka web sederhana untuk pengguna (HTML/CSS/JavaScript)
-* **Gateway**: API Gateway menggunakan GraphQL untuk mengelola permintaan
-* **Menu Service**: Mengelola data menu makanan
-* **Order Service**: Mengelola pesanan
-* **Payment Service**: Mengelola pembayaran
-* **User Service**: Mengelola data pengguna
-
-## Prerequisites
-
-Sebelum menjalankan proyek ini, pastikan Anda memiliki:
-
-* **Node.js** (versi 14 atau lebih baru) - [Download di sini](https://nodejs.org/)
-* **XAMPP** (untuk MySQL server) - [Download di sini](https://www.apachefriends.org/)
-* **npm** (biasanya sudah terinstall dengan Node.js)
-
-## Setup
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/ksazhr/food-delivery.git
-cd food-delivery-node
-
-```
-
-### 2. Install Dependencies
-
-Setiap service memiliki dependencies sendiri. Jalankan perintah berikut di setiap folder service:
-Di setiap folder (gateway, menu-service, order-service, payment-service, user-service) jalankan:
-
-```bash
-npm install
-
-```
-
-### 3. Setup Database
-
-1. Jalankan XAMPP dan start **MySQL** service.
-2. Buat database berikut: `food_menu`, `food_order`, `food_payment`, `food_user`.
-3. **Catatan**: Port default diatur ke **3308**. Jika port MySQL Anda berbeda, edit file `db/*.db.js` di setiap service.
-
-### 4. Menjalankan Server
-
-Buka terminal terpisah untuk setiap service dan jalankan perintah: `node server.js`.
+GraphQL Microservices menggunakan **Docker**, **MySQL**, dan **Gateway**.
 
 ---
 
-## API Documentation
+## 🧰 Teknologi
+- Node.js
+- Express
+- GraphQL
+- MySQL
+- Docker & Docker Compose
+- Postman
 
-Semua permintaan melalui Gateway di: `http://localhost:4000/graphql`.
+---
 
-### 1. Public Operations (Tanpa Token)
+## 1️⃣ Install Docker
 
-**Register**
+Download Docker Desktop:  
+https://www.docker.com/products/docker-desktop/
+
+Pastikan Docker sudah berjalan dengan membuka terminal / CMD:
+
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+## 2️⃣ Jalankan Project
+
+Masuk ke folder project, lalu jalankan:
+
+```bash
+docker compose up --build
+```
+
+Tunggu sampai semua service berjalan:
+- mysql
+- user-service
+- menu-service
+- order-service
+- payment-service
+- gateway
+
+---
+
+## 3️⃣ Endpoint GraphQL (Gateway)
+
+Semua request dilakukan melalui Gateway:
+
+http://localhost:4000/graphql
+
+Gunakan **Postman** → Tab **GraphQL**.
+
+---
+
+## 4️⃣ Login (Wajib)
+
+### Login Admin / User
 
 ```graphql
 mutation {
-  register(nama: "migu", email: "migu@mail.com", password: "password") {
+  login(
+    email: "admin@mail.com"
+    password: "password"
+  ) {
+    token
+    role
+  }
+}
+```
+
+Simpan `token` dari response.
+
+---
+
+## 5️⃣ Set Authorization (Postman)
+
+Masuk ke tab **Headers**, tambahkan:
+
+```
+Authorization: Bearer <TOKEN_DARI_LOGIN>
+```
+
+---
+
+## 6️⃣ Admin – Lihat Semua User
+
+```graphql
+query {
+  users {
     id
     nama
     email
-  } 
+    role
+  }
 }
-
 ```
 
-**Login**
+Catatan: hanya bisa diakses oleh **ADMIN**.
+
+---
+
+## 7️⃣ Admin – Tambah Menu
 
 ```graphql
 mutation {
-  login(email: "migu@mail.com", password: "password")
+  createMenu(
+    nama_produk: "Ayam Geprek"
+    kategori: "Makanan"
+    harga: 15000
+    stok: 10
+  ) {
+    id_produk
+    nama_produk
+    harga
+    stok
+  }
 }
-
 ```
 
-*Gunakan token yang dihasilkan untuk langkah berikutnya.*
+---
 
-### 2. User Operations (Memerlukan Authorization: Bearer <token>)
-
-**Melihat Daftar Menu**
+## 8️⃣ User – Lihat Semua Menu
 
 ```graphql
 query {
@@ -96,25 +134,42 @@ query {
     stok
   }
 }
-
 ```
 
-**Membuat Pesanan**
+---
+
+## 9️⃣ User – Buat Order
 
 ```graphql
 mutation {
-  addOrderItem(
-    id_order: 1
-    id_produk: 6
-    jumlah: 3
+  createOrder(
+    id_produk: 1
+    jumlah: 2
   ) {
-    id_item
-    subtotal
+    id_order
+    total_harga
+    status
   }
 }
-
 ```
-**Menampilkan Seluruh Pesanan**
+
+---
+
+## 🔟 User – Lihat Semua Order
+
+```graphql
+query {
+  orders {
+    id_order
+    total_harga
+    status
+  }
+}
+```
+
+---
+
+## 1️⃣1️⃣ User / Admin – Lihat Order Berdasarkan ID
 
 ```graphql
 query {
@@ -122,56 +177,37 @@ query {
     id_order
     total_harga
     status
-    items {
-      id_produk
-      jumlah
-      subtotal
-    }
   }
 }
-
 ```
 
-**Membayar Pesanan**
+Catatan:
+- Jika `order(id)` bernilai `null`
+- Tetapi `orders` berhasil
+- Kemungkinan menu pada order sudah dihapus
+- Karena query detail order menggunakan JOIN
+
+---
+
+## 1️⃣2️⃣ User – Bayar Order
 
 ```graphql
 mutation {
-  payOrder(id_order: 1, amount: 40000) {
+  payOrder(
+    id_order: 1
+    amount: 30000
+  ) {
     id_payment
     status
   }
 }
-
 ```
 
-### 3. Admin Operations (Memerlukan Authorization: Bearer <token_admin>)
+Setelah pembayaran, status order akan otomatis berubah.
 
-**Menambah Menu Baru**
+---
 
-```graphql
-mutation {
-  createMenu(nama_produk: "Ayam Bakar", harga: 25000, kategori: "Makanan", stok: 30) {
-    id_produk
-    nama_produk
-  }
-}
-
-```
-
-**Update Status Pesanan**
-
-```graphql
-# Status Enum: PENDING, DIPROSES, DIKIRIM, SELESAI, BATAL
-mutation {
-  updateOrderStatus(id_order: 1, status: DIKIRIM) {
-    id_order
-    status
-  }
-}
-
-```
-
-**Menghapus Menu**
+## 1️⃣3️⃣ Admin – Hapus Menu
 
 ```graphql
 mutation {
@@ -180,14 +216,17 @@ mutation {
     nama_produk
   }
 }
-
 ```
+
+Catatan:
+Menghapus menu yang sudah pernah dipesan dapat menyebabkan
+detail order tidak bisa ditampilkan.
 
 ---
 
-## Troubleshooting
+## ✅ Selesai
 
-* **Forbidden Internal Access**: Pastikan Anda mengakses melalui Gateway (Port 4000). Akses langsung ke microservice akan ditolak.
-* **Port conflict**: Jika port sudah digunakan, ubah port di `server.js` setiap service.
-* **Database error**: Pastikan MySQL running dan konfigurasi port di `db/*.db.js` sudah sesuai.
-
+Project berhasil dijalankan jika:
+- Docker berjalan
+- Gateway dapat diakses
+- Query GraphQL berhasil dijalankan di Postman

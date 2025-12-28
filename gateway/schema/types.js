@@ -6,6 +6,10 @@ const {
   GraphQLList
 } = require('graphql');
 
+const axios = require('axios'); 
+const ORDER_SERVICE_URL =
+  process.env.ORDER_SERVICE_URL || 'http://localhost:3002/graphql'; 
+  
 const MenuType = new GraphQLObjectType({
   name: 'Menu',
   fields: {
@@ -42,7 +46,7 @@ const OrderType = new GraphQLObjectType({
         const axios = require('axios');
 
         const res = await axios.post(
-          'http://localhost:3002/graphql',
+          ORDER_SERVICE_URL,
           {
             query: `
               query ($id: Int!) {

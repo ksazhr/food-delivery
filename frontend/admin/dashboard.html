@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<!-- 🔐 PROTEKSI ADMIN -->
+<script src="../js/admin-guard.js"></script>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>🍔 Admin</h2>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="menu.html">Menu</a>
+    <a href="orders.html">Orders</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </aside>
+
+  <!-- KONTEN -->
+  <main class="content">
+    <h1>Dashboard</h1>
+
+    <div class="cards">
+      <div class="stat">
+        <h3>Total Menu</h3>
+        <p id="totalMenu">0</p>
+      </div>
+
+      <div class="stat">
+        <h3>Total Order</h3>
+        <p id="totalOrder">0</p>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<!-- SCRIPT DASHBOARD -->
+<script src="../js/admin-dashboard.js"></script>
+
+<script>
+  function logout() {
+    localStorage.clear();
+    window.location.href = "../auth.html";
+  }
+</script>
+
+</body>
+</html>

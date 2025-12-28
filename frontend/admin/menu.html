@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Menu</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<!-- 🔐 PROTEKSI ADMIN -->
+<script src="../js/admin-guard.js"></script>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>🍔 Admin</h2>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="menu.html" class="active">Menu</a>
+    <a href="orders.html">Orders</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1>Kelola Menu</h1>
+
+    <!-- TABEL MENU -->
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Harga</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="menuList">
+        <tr>
+          <td colspan="3">Memuat menu...</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+</div>
+
+<script src="../js/admin-menu.js"></script>
+
+<script>
+  function logout() {
+    localStorage.clear();
+    window.location.href = "../auth.html";
+  }
+</script>
+
+</body>
+</html>

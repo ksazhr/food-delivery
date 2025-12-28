@@ -2,7 +2,18 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema');
 
+const connectMenuDB = require('./db/menu.db');
+
 const app = express();
+
+(async () => {
+  try {
+    await connectMenuDB();
+    console.log('🔥 Menu DB migration & seed done');
+  } catch (err) {
+    console.error('❌ Menu DB init failed:', err.message);
+  }
+})();
 
 app.use((req, res, next) => {
   const internalKey = req.headers['x-internal-key'];

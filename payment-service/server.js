@@ -2,7 +2,19 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema');
 
+const initPaymentDB = require('./db/payment.db');
+
 const app = express();
+
+(async () => {
+  try {
+    await initPaymentDB();
+    console.log('🔥 Payment DB migration & ready');
+  } catch (err) {
+    console.error('❌ Payment DB init failed:', err.message);
+    process.exit(1); 
+  }
+})();
 
 app.use((req, res, next) => {
   if (req.headers['x-internal-key'] !== 'GATEWAY_SECRET_123') {

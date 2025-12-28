@@ -1,6 +1,6 @@
 const graphql = require('graphql');
 const axios = require('axios');
-const paymentDB = require('../db/payment.db');
+const getPaymentDB = require('../db/payment.db');
 
 const {
   GraphQLObjectType,
@@ -55,19 +55,18 @@ const Mutation = new GraphQLObjectType({
       },
       async resolve(_, args) {
         try {
-          const success = true; 
-          const status = success ? 'SUCCESS' : 'FAILED';
+          const db = await getPaymentDB(); 
+          const status = 'SUCCESS'; 
 
           // 1️⃣ Simpan payment ke database
-          const [result] = await paymentDB.query(
+          const [result] = await db.query(
             'INSERT INTO payments (id_order, amount, status) VALUES (?, ?, ?)',
             [args.id_order, args.amount, status]
           );
 
           // 2️⃣ Update order status ke Order Service
-          // Pastikan port 3002 (Order Service) sudah jalan!
           await axios.post(
-          'http://localhost:3002/graphql',
+            process.env.ORDER_SERVICE_URL,
           {
             query: `
               mutation UpdateOrder($id: Int!, $status: OrderStatus!) {
@@ -82,7 +81,7 @@ const Mutation = new GraphQLObjectType({
             `,
             variables: {
               id: args.id_order,
-              status: success ? 'DIPROSES' : 'BATAL'
+              status: 'DIPROSES'
             }
           },
           {
@@ -99,7 +98,6 @@ const Mutation = new GraphQLObjectType({
             status
           };
         } catch (error) {
-          // Log ini akan muncul di terminal terminal payment-service
           console.error("=== ERROR DI PAYMENT SERVICE ===");
           if (error.response) {
             console.error("Data:", error.response.data);

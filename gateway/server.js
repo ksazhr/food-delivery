@@ -26,7 +26,10 @@ app.use('/graphql', graphqlHTTP(req => {
   return {
     schema,
     graphiql: true,
-    context: { user }
+    context: {
+      user,
+      req
+    }
   };
 }));
 

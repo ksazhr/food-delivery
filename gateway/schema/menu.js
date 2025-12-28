@@ -7,8 +7,9 @@ const {
 } = require('graphql');
 
 const { MenuType } = require('./types');
-
-const MENU_SERVICE_URL = 'http://localhost:3001/graphql';
+const MENU_SERVICE_URL =
+  process.env.MENU_SERVICE_URL || 'http://localhost:3001/graphql';
+  
 const INTERNAL_KEY = 'GATEWAY_SECRET_123';
 
 module.exports = {
@@ -18,38 +19,43 @@ module.exports = {
   ====================== */
 
   menus: {
-    type: new GraphQLList(MenuType),
-    async resolve() {
-      try {
-        const res = await axios.post(
-          MENU_SERVICE_URL,
-          {
-            query: `
-              query {
-                menus {
-                  id_produk
-                  nama_produk
-                  harga
-                  kategori
-                  stok
-                }
+  type: new GraphQLList(MenuType),
+  async resolve(parent, args, context) {
+    try {
+      const res = await axios.post(
+        MENU_SERVICE_URL,
+        {
+          query: `
+            query {
+              menus {
+                id_produk
+                nama_produk
+                harga
+                kategori
+                stok
               }
-            `
-          },
-          {
-            headers: { 'x-internal-key': INTERNAL_KEY }
+            }
+          `
+        },
+        {
+          headers: {
+            'x-internal-key': INTERNAL_KEY
           }
-        );
+        }
+      );
 
-        // Pastikan data ada, jika tidak kembalikan array kosong []
-        // Ini yang mencegah error .forEach di frontend
-        return res.data.data ? res.data.data.menus : [];
-      } catch (error) {
-        console.error("Menu Service Unreachable:", error.message);
-        return []; 
+      if (res.data.errors) {
+        console.error(res.data.errors);
+        return [];
       }
+
+      return res.data.data?.menus || [];
+    } catch (err) {
+      console.error('Menu Service Error:', err.message);
+      return [];
     }
-  },
+  }
+},
 
   menu: {
     type: MenuType,
@@ -177,7 +183,6 @@ module.exports = {
   },
 
   deleteMenu: {
-    // Jika type adalah MenuType, maka return di bawah harus objek menu, bukan string 'Menu deleted'
     type: MenuType, 
     args: { id_produk: { type: GraphQLNonNull(GraphQLInt) } },
     async resolve(_, args, context) {
@@ -202,7 +207,6 @@ module.exports = {
         }
       );
       
-      // Mengembalikan objek menu yang dihapus agar cocok dengan MenuType
       return res.data.data.deleteMenu;
     }
   }

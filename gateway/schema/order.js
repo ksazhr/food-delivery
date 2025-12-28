@@ -2,6 +2,9 @@ const axios = require('axios');
 const { GraphQLInt, GraphQLNonNull, GraphQLList } = require('graphql');
 const { OrderType, OrderStatusEnum, OrderItemType } = require('./types.js');
 
+const ORDER_SERVICE_URL =
+  process.env.ORDER_SERVICE_URL || 'http://localhost:3002/graphql';
+
 module.exports = {
 
   orders: {
@@ -13,7 +16,7 @@ module.exports = {
       }
 
       const res = await axios.post(
-        'http://localhost:3002/graphql',
+        ORDER_SERVICE_URL,
         {
           query: `
             query {
@@ -48,7 +51,7 @@ module.exports = {
       }
 
       const res = await axios.post(
-        'http://localhost:3002/graphql',
+        ORDER_SERVICE_URL,
         {
           query: `
             query ($id: Int!) {
@@ -71,7 +74,7 @@ module.exports = {
   },
 
   addOrderItem: {
-    type: OrderItemType, // atau OrderItemType kalau mau lebih tepat
+    type: OrderItemType, 
     args: {
       id_order: { type: GraphQLNonNull(GraphQLInt) },
       id_produk: { type: GraphQLNonNull(GraphQLInt) },
@@ -84,7 +87,7 @@ module.exports = {
       }
 
       const res = await axios.post(
-        'http://localhost:3002/graphql',
+        ORDER_SERVICE_URL,
         {
           query: `
             mutation AddItem($order: Int!, $product: Int!, $qty: Int!) {
@@ -128,7 +131,7 @@ module.exports = {
       }
 
       const res = await axios.post(
-        'http://localhost:3002/graphql',
+        ORDER_SERVICE_URL,
         {
           query: `
             mutation {
@@ -167,7 +170,7 @@ module.exports = {
       }
 
       const res = await axios.post(
-        'http://localhost:3002/graphql',
+        ORDER_SERVICE_URL,
         {
           query: `
             mutation UpdateOrder($id: Int!, $status: OrderStatus!) {

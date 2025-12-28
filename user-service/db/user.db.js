@@ -1,23 +1,20 @@
 const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
 
-const userDB = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'food_user',
-  port: 3308
-});
-
-module.exports = userDB;
-module.exports.runUserMigrations = runUserMigrations;
-
-// Migration and Seeder for User
-async function runUserMigrations() {
+async function connectUserDB(retry = 10) {
   try {
-    console.log('Running user migrations...');
+    const pool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD || '',
+      database: 'food_user',
+      port: 3306
+    });
 
-    // 1. Create table user
-    const createTableQuery = `
+    await pool.query('SELECT 1');
+    console.log('✅ user DB connected');
+
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         nama VARCHAR(100) NOT NULL,
@@ -26,31 +23,30 @@ async function runUserMigrations() {
         role ENUM('USER', 'ADMIN') DEFAULT 'USER',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `;
-
-    await userDB.query(createTableQuery);
-
-    // 2. Seed data
-    const bcrypt = require('bcryptjs');
+    `);
 
     const users = [
-      { nama: 'Admin', email: 'admin@mail.com', password: '12345678', role: 'ADMIN' },
-      { nama: 'John Doe', email: 'john@mail.com', password: '12345678', role: 'USER' },
+      ['Admin', 'admin@mail.com', await bcrypt.hash('12345678', 10), 'ADMIN'],
+      ['John Doe', 'john@mail.com', await bcrypt.hash('12345678', 10), 'USER']
     ];
 
-    for (const user of users) {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      const insertQuery = `
-        INSERT IGNORE INTO users (nama, email, password, role)
-        VALUES (?, ?, ?, ?)
-      `;
-      await userDB.query(insertQuery, [user.nama, user.email, hashedPassword, user.role]);
+    for (const u of users) {
+      await pool.query(
+        `INSERT IGNORE INTO users (nama, email, password, role)
+         VALUES (?, ?, ?, ?)`,
+        u
+      );
     }
 
-  } catch (error) {
-    console.error('Migration failed:', error);
-    process.exit(1);
+    console.log('✅ users table & seed ready');
+    return pool;
+
+  } catch (err) {
+    console.log(`⏳ user DB belum siap, retry ${retry}`);
+    if (retry === 0) throw err;
+    await new Promise(r => setTimeout(r, 3000));
+    return connectUserDB(retry - 1);
   }
 }
 
-runUserMigrations();
+module.exports = connectUserDB;

@@ -1,5 +1,5 @@
 const graphql = require('graphql');
-const menuDB = require('../db/menu.db');
+const connectMenuDB = require('../db/menu.db');
 
 const {
   GraphQLObjectType,
@@ -35,9 +35,8 @@ const RootQuery = new GraphQLObjectType({
     menus: {
       type: new GraphQLList(MenuType),
       async resolve() {
-        const [rows] = await menuDB.query(
-          'SELECT * FROM menu'
-        );
+        const menuDB = await connectMenuDB();
+        const [rows] = await menuDB.query('SELECT * FROM menu');
         return rows;
       }
     },
@@ -49,6 +48,7 @@ const RootQuery = new GraphQLObjectType({
         id_produk: { type: GraphQLNonNull(GraphQLInt) }
       },
       async resolve(_, args) {
+        const menuDB = await connectMenuDB();
         const [rows] = await menuDB.query(
           'SELECT * FROM menu WHERE id_produk = ?',
           [args.id_produk]
@@ -67,7 +67,6 @@ const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
 
-    // CREATE MENU
     createMenu: {
       type: MenuType,
       args: {
@@ -77,6 +76,8 @@ const Mutation = new GraphQLObjectType({
         stok: { type: GraphQLInt }
       },
       async resolve(_, args) {
+        const menuDB = await connectMenuDB();
+
         const [res] = await menuDB.query(
           'INSERT INTO menu (nama_produk, harga, kategori, stok) VALUES (?, ?, ?, ?)',
           [args.nama_produk, args.harga, args.kategori, args.stok]
@@ -89,7 +90,6 @@ const Mutation = new GraphQLObjectType({
       }
     },
 
-    // UPDATE MENU
     updateMenu: {
       type: MenuType,
       args: {
@@ -100,14 +100,14 @@ const Mutation = new GraphQLObjectType({
         stok: { type: GraphQLInt }
       },
       async resolve(_, args) {
+        const menuDB = await connectMenuDB();
+
         const { id_produk, ...data } = args;
-        
-        // Buat query string secara dinamis
         const keys = Object.keys(data);
         const values = Object.values(data);
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
 
-        if (keys.length > 0) {
+        if (keys.length) {
+          const setClause = keys.map(k => `${k} = ?`).join(', ');
           await menuDB.query(
             `UPDATE menu SET ${setClause} WHERE id_produk = ?`,
             [...values, id_produk]
@@ -122,13 +122,13 @@ const Mutation = new GraphQLObjectType({
       }
     },
 
-    // DELETE MENU
     deleteMenu: {
       type: MenuType,
       args: {
         id_produk: { type: GraphQLNonNull(GraphQLInt) }
       },
       async resolve(_, args) {
+        const menuDB = await connectMenuDB();
 
         const [rows] = await menuDB.query(
           'SELECT * FROM menu WHERE id_produk = ?',

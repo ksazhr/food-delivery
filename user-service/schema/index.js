@@ -2,7 +2,7 @@ const graphql = require('graphql');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const userDB = require('../db/user.db');
+const connectUserDB = require('../db/user.db');
 
 const {
   GraphQLObjectType,
@@ -34,6 +34,7 @@ const RootQuery = new GraphQLObjectType({
     users: {
       type: graphql.GraphQLList(UserType),
       async resolve() {
+        const userDB = await connectUserDB();
         const [rows] = await userDB.query(
           'SELECT id, nama, email, role FROM users'
         );
@@ -59,6 +60,7 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLNonNull(GraphQLString) }
       },
       async resolve(_, args) {
+        const userDB = await connectUserDB(); 
         try {
           const hashed = await bcrypt.hash(args.password, 10);
 
@@ -93,6 +95,7 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLNonNull(GraphQLString) }
       },
       async resolve(_, args) {
+        const userDB = await connectUserDB();
         console.log('Login attempt:', args.email);
 
         const [rows] = await userDB.query(
@@ -118,7 +121,7 @@ const Mutation = new GraphQLObjectType({
         const token = jwt.sign(
           {
             id: user.id,
-            role: user.role
+            role: user.role.toUpperCase()
           },
           'SECRET_KEY',
           { expiresIn: '1d' }
