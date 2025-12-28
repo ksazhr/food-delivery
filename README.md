@@ -58,7 +58,7 @@ Gunakan **Postman → Tab GraphQL**.
 
 ---
 
-Notes : Jika Ingin Membuka Website Gunakan LiveServer atau http://127.0.0.1:5500/frontend/
+Note : Jika Ingin Membuka Website Gunakan LiveServer atau http://127.0.0.1:5500/frontend/
 
 ## 4️⃣ Login/Register (WAJIB – Admin & User)
 
