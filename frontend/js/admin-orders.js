@@ -52,7 +52,7 @@ async function fetchOrders() {
       <td>${order.status}</td>
       <td>
         ${
-          order.status === "PENDING"
+          order.status === "PENDING" || order.status === "DIPROSES"
             ? `<button class="btn-success"
                 onclick="selesaikanOrder(${order.id_order})">
                 Tandai Selesai
