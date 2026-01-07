@@ -67,11 +67,7 @@ mutation {
   login(
     email: "admin@mail.com"
     password: "12345678"
-  ) {
-    token
-    role
-  }
-}
+  )}
 ```
 
 ```graphql
