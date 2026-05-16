@@ -10,9 +10,7 @@ if (!token) {
 const cartList = document.getElementById("cartList");
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-/* ======================
-   RENDER KERANJANG
-====================== */
+
 function renderCart() {
   cartList.innerHTML = "";
 
@@ -42,9 +40,7 @@ function renderCart() {
   });
 }
 
-/* ======================
-   HAPUS ITEM
-====================== */
+
 function removeItem(index) {
   if (!confirm("Hapus item dari keranjang?")) return;
 
@@ -53,9 +49,7 @@ function removeItem(index) {
   renderCart();
 }
 
-/* ======================
-   CHECKOUT
-====================== */
+
 async function checkout() {
   if (cart.length === 0) {
     alert("Keranjang kosong");
@@ -63,7 +57,7 @@ async function checkout() {
   }
 
   try {
-    // 1️⃣ CREATE ORDER (pakai item pertama)
+   
     const createRes = await fetch(API_URL, {
       method: "POST",
       headers: {
@@ -94,7 +88,7 @@ async function checkout() {
     const orderId = createData.data.createOrder.id_order;
     let totalHarga = createData.data.createOrder.total_harga;
 
-    // 2️⃣ ADD ITEM LAINNYA
+    
     for (let i = 1; i < cart.length; i++) {
       const item = cart[i];
 
@@ -122,7 +116,7 @@ async function checkout() {
       totalHarga += item.harga * item.jumlah;
     }
 
-    // 3️⃣ SIMPAN & PINDAH
+    
     localStorage.removeItem("cart");
     localStorage.setItem("orderId", orderId);
     localStorage.setItem("orderAmount", totalHarga);
@@ -135,12 +129,10 @@ async function checkout() {
   }
 }
 
-/* ======================
-   NAVIGASI
-====================== */
+
 function backToMenu() {
   window.location.href = "menu.html";
 }
 
-// render pertama kali
+
 renderCart();

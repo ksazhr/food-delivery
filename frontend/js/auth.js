@@ -2,22 +2,20 @@ console.log("auth.js loaded");
 
 const API_URL = "http://localhost:4000/graphql";
 
-// ===== ELEMENT LOGIN =====
+
 const loginForm = document.getElementById("loginForm");
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
 const loginResult = document.getElementById("loginResult");
 
-// ===== ELEMENT REGISTER =====
+
 const registerForm = document.getElementById("registerForm");
 const regNama = document.getElementById("regNama");
 const regEmail = document.getElementById("regEmail");
 const regPassword = document.getElementById("regPassword");
 const registerResult = document.getElementById("registerResult");
 
-/* ======================
-   HELPER: DECODE JWT
-====================== */
+
 function parseJwt(token) {
   try {
     const base64Payload = token.split(".")[1];
@@ -28,9 +26,7 @@ function parseJwt(token) {
   }
 }
 
-/* ======================
-   REGISTER
-====================== */
+
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -76,9 +72,7 @@ if (registerForm) {
   });
 }
 
-/* ======================
-   LOGIN (USER & ADMIN)
-====================== */
+
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -121,7 +115,7 @@ if (loginForm) {
 
       localStorage.setItem("role", payload.role);
 
-      // 🚦 REDIRECT SESUAI ROLE
+      
       if (payload.role === "ADMIN") {
         window.location.href = "admin/dashboard.html";
       } else {

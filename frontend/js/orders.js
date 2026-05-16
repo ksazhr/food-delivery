@@ -9,9 +9,7 @@ if (!token) {
 
 const orderList = document.getElementById("orderList");
 
-/* ======================
-   FETCH ORDER SAYA
-====================== */
+
 async function fetchOrders() {
   const query = `
     query {
@@ -53,7 +51,7 @@ async function fetchOrders() {
 
     let actionButton = "";
 
-    // 🔴 JIKA STATUS PENDING → TAMPILKAN TOMBOL BAYAR
+    
     if (order.status.toUpperCase() === "PENDING") {
       actionButton = `
         <button class="pay-btn-small"
@@ -74,9 +72,7 @@ async function fetchOrders() {
   });
 }
 
-/* ======================
-   BAYAR ULANG
-====================== */
+
 function payAgain(orderId, total) {
   localStorage.setItem("orderId", orderId);
   localStorage.setItem("orderAmount", total);

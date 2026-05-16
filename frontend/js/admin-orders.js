@@ -5,9 +5,7 @@ const token = localStorage.getItem("token");
 
 const orderList = document.getElementById("orderList");
 
-/* ======================
-   FETCH SEMUA ORDER (ADMIN)
-====================== */
+
 async function fetchOrders() {
   const query = `
     query {
@@ -67,9 +65,7 @@ async function fetchOrders() {
   });
 }
 
-/* ======================
-   UPDATE STATUS → SELESAI
-====================== */
+
 async function selesaikanOrder(idOrder) {
   if (!confirm("Tandai order ini sebagai SELESAI?")) return;
 

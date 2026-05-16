@@ -6,20 +6,16 @@ const token = localStorage.getItem("token");
 const orderId = localStorage.getItem("orderId");
 const amount = localStorage.getItem("orderAmount");
 
-// JIKA DATA HILANG, BALIK KE MENU
+
 if (!token || !orderId || !amount) {
   window.location.href = "menu.html";
 }
 
-/* ======================
-   TAMPILKAN INFO ORDER
-====================== */
+
 document.getElementById("orderIdText").innerText = `#${orderId}`;
 document.getElementById("orderTotalText").innerText = `Rp${amount}`;
 
-/* ======================
-   PAY ORDER
-====================== */
+
 async function payOrder() {
   const query = `
     mutation PayOrder($id: Int!, $amount: Int!) {
@@ -53,11 +49,11 @@ async function payOrder() {
     return;
   }
 
-  // BERSIHKAN DATA PAYMENT
+  
   localStorage.removeItem("orderId");
   localStorage.removeItem("orderAmount");
 
-  // PINDAH KE ORDER SAYA
+  
   window.location.href = "orders.html";
 }
 

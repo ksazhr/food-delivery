@@ -9,12 +9,9 @@ if (!token) {
 
 const menuList = document.getElementById("menuList");
 
-// ambil cart dari localStorage
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-/* ======================
-   FETCH MENU
-====================== */
+
 async function fetchMenu() {
   const query = `
     query {
@@ -83,9 +80,7 @@ async function fetchMenu() {
   });
 }
 
-/* ======================
-   ADD TO CART
-====================== */
+
 function addToCart(idProduk, nama, harga) {
   const qtyInput = document.getElementById(`qty-${idProduk}`);
   const jumlah = parseInt(qtyInput.value);
@@ -112,7 +107,5 @@ function addToCart(idProduk, nama, harga) {
   alert(`${nama} ditambahkan ke keranjang`);
 }
 
-/* ======================
-   JALANKAN
-====================== */
+
 fetchMenu();
